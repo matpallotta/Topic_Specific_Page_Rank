@@ -62,7 +62,7 @@ def single_iteration_page_rank(graph, page_rank_vector, alpha, topic_movie_ids):
                 r += float((1-alpha)) * (float(page_rank_vector[neighbour]) * float(graph[neighbour][node]['weight'])
                                          /float(weight_sum_edges(graph, neighbour)))
 
-        next_page_rank_vector[node] = r
+        next_page_rank_vector[str(node)] = r
         summ += r
 
     leakedPR = 1 - summ
