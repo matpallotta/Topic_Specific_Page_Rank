@@ -20,7 +20,7 @@ def from_file_to_dic_topic_movies():
     i = 1
     for line in lines:
         for movie in line:
-            dictionary.get(i).append(int(movie))
+            dictionary.get(i).append(movie)
         i += 1
     return dictionary
 
