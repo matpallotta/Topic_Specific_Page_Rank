@@ -2,7 +2,6 @@ import pprint as pp
 import csv
 import networkx as nx
 import time
-import sys
 
 input_graph = "./datasets/movie_graph.txt"
 input_movies_category = "./datasets/category_movies.txt"
@@ -14,14 +13,15 @@ epsilon = 10**-6
 
 def from_file_to_dic_topic_movies():
     f = open(input_movies_category, 'r')
-    lines = f.readlines()
-    f.close()
+    input_file_csv_reader = csv.reader(f, delimiter='\t', quotechar='"', quoting=csv.QUOTE_NONE)
+
     dictionary = {1: [], 2: [], 3: [], 4: [], 5: []}  # since we have only five topics
     i = 1
-    for line in lines:
-        for movie in line:
-            dictionary.get(i).append(movie)
+    for movies in input_file_csv_reader:
+        for movie in movies:
+            dictionary.get(i).append(int(movie))
         i += 1
+    f.close()
     return dictionary
 
 
@@ -40,6 +40,7 @@ def get_distance(vector_1, vector_2):
         distance += abs(vector_1[i] - vector_2[i])
         i += 1
     return distance
+
 
 # Complete the method, please.
 def create_initial_pagerank_vector(graph):
@@ -62,13 +63,13 @@ def single_iteration_page_rank(graph, page_rank_vector, alpha, topic_movie_ids):
                 r += float((1-alpha)) * (float(page_rank_vector[neighbour]) * float(graph[neighbour][node]['weight'])
                                          /float(weight_sum_edges(graph, neighbour)))
 
-        next_page_rank_vector[str(node)] = r
+        next_page_rank_vector[node] = r
         summ += r
 
     leakedPR = 1 - summ
 
     for movie_id in topic_movie_ids:
-        next_page_rank_vector[movie_id] += leakedPR / len(topic_movie_ids)
+        next_page_rank_vector[int(movie_id)] += leakedPR / len(topic_movie_ids)
 
     return next_page_rank_vector
 
@@ -111,8 +112,8 @@ print
 
 def save_page_rank_result_into_file(result, topic_index):
     f = open('./datasets/page_rank_category_' + str(topic_index) + '.txt', 'w')
-    for movie_id, pr in result:
-        f.write('%s, %s\n' % (str(movie_id), str(pr)))
+    for movie_id in result.keys():
+        f.write('%s, %s\n' % (str(movie_id), str(result[movie_id])))
     f.close()
 
 
@@ -168,7 +169,7 @@ for page_rank_vector in list_of_page_rank_vectors:
             break
 
         previous_page_rank_vector = page_rank_vector
-        pp.pprint (page_rank_vector)
+        pp.pprint(page_rank_vector)
 
         page_rank_vector_sum = sum(page_rank_vector.values())
         print(" page rank vector sum: " + str(page_rank_vector_sum))

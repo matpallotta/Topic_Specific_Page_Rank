@@ -134,7 +134,7 @@ while True:
 
 	page_rank_vector_sum = sum(page_rank_vector.values())
 	print(" page rank vector sum: " + str(page_rank_vector_sum))
-	print ("time this iteration took: " + str(end_time - start_time))
+	print ("time this iteration took: " + str(end_time - start_time)/60 + "mins")
 	print ("****************************************************")
 
 # Useful for debugging ;)

@@ -4,9 +4,13 @@ import networkx as nx
 import time
 import sys
 
-input_graph = sys.argv[1]
-input_user_movie_rating_path = sys.argv[2]
-input_user_id = sys.argv[3]
+# input_graph = sys.argv[1]
+# input_user_movie_rating_path = sys.argv[2]
+# input_user_id = sys.argv[3]
+
+input_graph = './datasets/movie_graph.txt'
+input_user_movie_rating_path = "./datasets/user_movie_rating.txt"
+input_user_id = 2290
 
 
 alpha = .15
@@ -49,8 +53,7 @@ def create_initial_pagerank_vector(graph):
     return page_rank_vector
 
 
-
-def single_iteration_page_rank(graph, page_rank_vector, alpha):
+def single_iteration_page_rank(graph, page_rank_vector_dic, alpha):
     next_page_rank_vector = {}
     summ = 0
 
@@ -58,16 +61,17 @@ def single_iteration_page_rank(graph, page_rank_vector, alpha):
         r = 0
         if len(graph[node].keys()) != 0:
             for neighbour in graph[node].keys():
-                r += float((1-alpha)) * (float(page_rank_vector[neighbour]) * float(graph[neighbour][node]['weight'])
-                                         /float(weight_sum_edges(graph, neighbour)))
+                r += float((1 - alpha)) * (float(page_rank_vector_dic[neighbour]) * float(graph[neighbour][node]['weight'])
+                                           / float(weight_sum_edges(graph, neighbour)))
 
         next_page_rank_vector[node] = r
         summ += r
 
     leakedPR = 1 - summ
-    dic_movie_rating_for_user = from_file_to_dic_user_dic_movie_rating()[int(input_user_id)]
+    dic_user_movie_rating = from_file_to_dic_user_dic_movie_rating()
+    dic_movie_rating_for_user = dic_user_movie_rating[int(input_user_id)]
     for movie, rating in dic_movie_rating_for_user.items():
-        next_page_rank_vector[movie] += float(leakedPR) * float(rating)/sum(dic_movie_rating_for_user.values())
+        next_page_rank_vector[int(movie)] += float(leakedPR) * float(rating)/sum(dic_movie_rating_for_user.values())
 
     return next_page_rank_vector
 
@@ -154,8 +158,8 @@ while True:
     for movie in dic_movie_rating_for_user.keys():
         page_rank_vector.pop(movie)
 
-    final_page_rank_list = sorted(page_rank_vector, key=lambda x: x[1], reverse=True)
-    pp.pprint (final_page_rank_list)
+    final_page_rank_list = sorted(page_rank_vector.items(), key=lambda x: x[1], reverse=True)
+    pp.pprint(final_page_rank_list)
 
     print ("****************************************************")
 
