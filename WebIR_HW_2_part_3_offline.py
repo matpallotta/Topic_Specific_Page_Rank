@@ -173,8 +173,8 @@ for page_rank_vector in list_of_page_rank_vectors:
 
         page_rank_vector_sum = sum(page_rank_vector.values())
         print(" page rank vector sum: " + str(page_rank_vector_sum))
-        print ("time this iteration took: " + str((end_time - start_time)/60) + "mins")
-        print ("total time : " + str((end_time - total_start_time) / 60) + "mins")
+        print ("time this iteration took: " + str((end_time - start_time)/60) + " mins")
+        print ("total time : " + str((end_time - total_start_time) / 60) + " mins")
 
         # final_page_rank_list = sorted(page_rank_vector, key=lambda x: x[1], reverse=True)
         # pp.pprint (final_page_rank_list)

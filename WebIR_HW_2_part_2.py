@@ -8,7 +8,7 @@ import sys
 # input_user_movie_rating_path = sys.argv[2]
 # input_user_id = sys.argv[3]
 
-input_graph = './datasets/movie_graph.txt'
+input_graph = "./datasets/movie_graph.txt"
 input_user_movie_rating_path = "./datasets/user_movie_rating.txt"
 input_user_id = 2290
 
