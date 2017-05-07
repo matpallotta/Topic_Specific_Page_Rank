@@ -65,7 +65,7 @@ def single_iteration_page_rank(graph, page_rank_vector, alpha):
         summ += r
 
     leakedPR = 1 - summ
-    dic_movie_rating_for_user = from_file_to_dic_user_dic_movie_rating()[input_user_id]
+    dic_movie_rating_for_user = from_file_to_dic_user_dic_movie_rating()[int(input_user_id)]
     for movie, rating in dic_movie_rating_for_user.items():
         next_page_rank_vector[movie] += float(leakedPR) * float(rating)/sum(dic_movie_rating_for_user.values())
 
