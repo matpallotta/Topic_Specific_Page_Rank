@@ -51,7 +51,7 @@ def create_initial_pagerank_vector(graph):
 
 
 # Complete the method, please.
-def single_iteration_page_rank(graph, page_rank_vector, alpha, topic_movie_ids):
+def single_iteration_page_rank(graph, page_rank_vector, alpha, topic_movie_ids, dic_node_weight_sum):
 
     next_page_rank_vector = {}
     summ = 0
@@ -61,7 +61,7 @@ def single_iteration_page_rank(graph, page_rank_vector, alpha, topic_movie_ids):
         if len(graph[node].keys()) != 0:
             for neighbour in graph[node].keys():
                 r += float((1-alpha)) * (float(page_rank_vector[neighbour]) * float(graph[neighbour][node]['weight'])
-                                         /float(weight_sum_edges(graph, neighbour)))
+                                         /dic_node_weight_sum[neighbour])
 
         next_page_rank_vector[node] = r
         summ += r
@@ -81,11 +81,28 @@ g = nx.Graph()
 # load graph
 input_file = open(input_graph, 'r')
 input_file_csv_reader = csv.reader(input_file, delimiter='\t', quotechar='"', quoting=csv.QUOTE_NONE)
+
+dic_node_weight_sum = {}
+
 for node_node_weight in input_file_csv_reader:
     g.add_node(int(node_node_weight[0]))
     g.add_node(int(node_node_weight[1]))
+
     g.add_edge(int(node_node_weight[0]), int(node_node_weight[1]), weight=int(node_node_weight[2]))
+
+    if int(node_node_weight[0]) not in dic_node_weight_sum:
+        dic_node_weight_sum[int(node_node_weight[0])] = 0
+
+    if int(node_node_weight[1]) not in dic_node_weight_sum:
+        dic_node_weight_sum[int(node_node_weight[1])] = 0
+
+    dic_node_weight_sum[int(node_node_weight[0])] += int(node_node_weight[2])
+    dic_node_weight_sum[int(node_node_weight[1])] += int(node_node_weight[2])
+
 input_file.close()
+
+
+
 
 '''
 # print graph
@@ -146,7 +163,7 @@ for page_rank_vector in list_of_page_rank_vectors:
         # print ("END previous_PR_vector")
 
         # compute next value
-        page_rank_vector = single_iteration_page_rank(g, previous_page_rank_vector, alpha, topic_movie_ids)
+        page_rank_vector = single_iteration_page_rank(g, previous_page_rank_vector, alpha, topic_movie_ids, dic_node_weight_sum)
 
         end_time = time.clock()
 

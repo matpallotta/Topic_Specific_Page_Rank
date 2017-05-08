@@ -6,7 +6,7 @@ import sys
 
 # input_graph = sys.argv[1]
 # input_user_movie_rating_path = sys.argv[2]
-# input_user_id = sys.argv[3]
+# input_user_id = int(sys.argv[3])
 
 input_graph = "./datasets/movie_graph.txt"
 input_user_movie_rating_path = "./datasets/user_movie_rating.txt"
@@ -29,14 +29,6 @@ def from_file_to_dic_user_dic_movie_rating():
     input_file.close()
     return dictionary
 
-def weight_sum_edges(graph, node):
-    weight_sum = 0
-
-    for neighbour, attrs in graph[node].items():
-        weight_sum += attrs['weight']
-    return weight_sum
-
-
 def get_distance(vector_1, vector_2):
     distance = 0
     i = 1
@@ -53,16 +45,16 @@ def create_initial_pagerank_vector(graph):
     return page_rank_vector
 
 
-def single_iteration_page_rank(graph, page_rank_vector_dic, alpha):
+def single_iteration_page_rank(graph, page_rank_vector_dic, alpha, dic_weight_sum):
     next_page_rank_vector = {}
     summ = 0
 
     for node in graph:
         r = 0
         if len(graph[node].keys()) != 0:
-            for neighbour in graph[node].keys():
+            for neighbour in graph[node]:
                 r += float((1 - alpha)) * (float(page_rank_vector_dic[neighbour]) * float(graph[neighbour][node]['weight'])
-                                           / float(weight_sum_edges(graph, neighbour)))
+                                           / dic_weight_sum[neighbour])
 
         next_page_rank_vector[node] = r
         summ += r
@@ -76,6 +68,7 @@ def single_iteration_page_rank(graph, page_rank_vector_dic, alpha):
     return next_page_rank_vector
 
 
+
 # undirected graph creation
 g = nx.Graph()
 
@@ -83,11 +76,26 @@ g = nx.Graph()
 # load graph
 input_file = open(input_graph, 'r')
 input_file_csv_reader = csv.reader(input_file, delimiter='\t', quotechar='"', quoting=csv.QUOTE_NONE)
+
+dic_node_weight_sum = {}
+
 for node_node_weight in input_file_csv_reader:
     g.add_node(int(node_node_weight[0]))
     g.add_node(int(node_node_weight[1]))
+
     g.add_edge(int(node_node_weight[0]), int(node_node_weight[1]), weight=int(node_node_weight[2]))
+
+    if int(node_node_weight[0]) not in dic_node_weight_sum:
+        dic_node_weight_sum[int(node_node_weight[0])] = 0
+
+    if int(node_node_weight[1]) not in dic_node_weight_sum:
+        dic_node_weight_sum[int(node_node_weight[1])] = 0
+
+    dic_node_weight_sum[int(node_node_weight[0])] += int(node_node_weight[2])
+    dic_node_weight_sum[int(node_node_weight[1])] += int(node_node_weight[2])
+
 input_file.close()
+
 
 '''
 # print graph
@@ -114,7 +122,11 @@ print
 
 # Compute PageRank
 previous_page_rank_vector = create_initial_pagerank_vector(g)  # for every node set pr[node] = 1/n
+'''
+print("start of print of initial page rank vector")
 print(previous_page_rank_vector)
+print("end of print of initial page rank vector")
+'''
 page_rank_vector = {}
 num_iterations = 0  # t=0
 total_start_time = time.clock()
@@ -124,7 +136,7 @@ while True:
     # print ("END previous_PR_vector")
 
     # compute next value
-    page_rank_vector = single_iteration_page_rank(g, previous_page_rank_vector, alpha)
+    page_rank_vector = single_iteration_page_rank(g, previous_page_rank_vector, alpha, dic_node_weight_sum)
 
     end_time = time.clock()
 
@@ -151,17 +163,20 @@ while True:
 
     page_rank_vector_sum = sum(page_rank_vector.values())
     print(" page rank vector sum: " + str(page_rank_vector_sum))
-    print ("time this iteration took: " + str((end_time - start_time)/60) + "mins")
-    print ("total time : " + str((end_time - total_start_time) / 60) + "mins")
+    print("time this iteration took: " + str((end_time - start_time)) + "sec")
+    print("total time : " + str((end_time - total_start_time)) + "sec")
 
-    dic_movie_rating_for_user = from_file_to_dic_user_dic_movie_rating()[input_user_id]
-    for movie in dic_movie_rating_for_user.keys():
-        page_rank_vector.pop(movie)
 
-    final_page_rank_list = sorted(page_rank_vector.items(), key=lambda x: x[1], reverse=True)
-    pp.pprint(final_page_rank_list)
+dic_movie_rating_for_user = from_file_to_dic_user_dic_movie_rating()[input_user_id]
+for movie in dic_movie_rating_for_user.keys():
+    page_rank_vector.pop(movie)
 
-    print ("****************************************************")
+final_page_rank_list = sorted(page_rank_vector.items(), key=lambda x: x[1], reverse=True)
+print ("****************************************************")
+print("start final page rank list")
+pp.pprint(final_page_rank_list)
+print("end final page rank list")
+print ("****************************************************")
 
 
 
